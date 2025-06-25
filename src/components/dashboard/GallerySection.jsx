@@ -15,6 +15,17 @@ const GallerySection = ({
     ? { background: `linear-gradient(${gradientDirection}, ${gradientColors[0]}, ${gradientColors[1]})` }
     : { backgroundColor };
 
+  // Use real images from gallerySettings.images, fallback to mock images if not present
+  const galleryImages = (gallerySettings.images && gallerySettings.images.length > 0)
+    ? gallerySettings.images.map((img, idx) => ({ image: img, text: `Gallery ${idx + 1}` }))
+    : [
+        { image: '/images/gall1.jpg', text: 'Gallery 1' },
+        { image: '/images/gall2.jpg', text: 'Gallery 2' },
+        { image: '/images/gall3.jpg', text: 'Gallery 3' },
+        { image: '/images/gall4.jpg', text: 'Gallery 4' },
+        { image: '/images/gall5.jpg', text: 'Gallery 5' },
+      ];
+
   return (
     <section
       id="gallery"
@@ -27,6 +38,7 @@ const GallerySection = ({
         </h2>
         <div style={{ height: '600px', position: 'relative' }}>
           <CircularGallery
+            items={galleryImages}
             bend={gallerySettings.bend}
             textColor={gallerySettings.textColor}
             borderRadius={gallerySettings.borderRadius}

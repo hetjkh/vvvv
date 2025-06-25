@@ -1,13 +1,13 @@
-import React from 'react';
-import { ArrowRight, MapPin } from 'lucide-react';
-import Badge from './Badge';
-import Glow from './Glow';
-import mask1 from '../../app/dashboard/1image.png';
-import mask2 from '../../app/dashboard/2image.png';
+import React from "react";
+import { ArrowRight, MapPin } from "lucide-react";
+import Badge from "./Badge";
+import Glow from "./Glow";
+import mask1 from "../../app/dashboard/1image.png";
+import mask2 from "../../app/dashboard/2image.png";
 
 // Utility function for class names
 const cn = (...classes) => {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 };
 
 // ProfileHero component
@@ -18,7 +18,7 @@ const ProfileHero = ({
   age,
   lookingFor,
   verified,
-  imageUrl,
+  imageUrl = "/images/hero1.jpg",
   backgroundColor,
   gradientEnabled,
   gradientDirection,
@@ -38,14 +38,16 @@ const ProfileHero = ({
   imagePositionY,
   imageScale,
   heroLayout,
-  maskSize
+  maskSize,
 }) => {
   const backgroundStyle = gradientEnabled
-    ? { background: `linear-gradient(${gradientDirection}, ${gradientColors[0]}, ${gradientColors[1]})` }
+    ? {
+        background: `linear-gradient(${gradientDirection}, ${gradientColors[0]}, ${gradientColors[1]})`,
+      }
     : { backgroundColor };
 
   const imageShapeClasses = {
-    circle: 'rounded-full'
+    circle: "rounded-full",
   };
 
   const imageMaskStyles = {
@@ -55,24 +57,25 @@ const ProfileHero = ({
       WebkitMaskImage: `url(${mask1.src})`,
       maskSize: `${maskSize}%`,
       WebkitMaskSize: `${maskSize}%`,
-      maskRepeat: 'no-repeat',
-      WebkitMaskRepeat: 'no-repeat',
-      maskPosition: 'center',
-      WebkitMaskPosition: 'center',
+      maskRepeat: "no-repeat",
+      WebkitMaskRepeat: "no-repeat",
+      maskPosition: "center",
+      WebkitMaskPosition: "center",
     },
     mask2: {
       maskImage: `url(${mask2.src})`,
       WebkitMaskImage: `url(${mask2.src})`,
       maskSize: `${maskSize}%`,
       WebkitMaskSize: `${maskSize}%`,
-      maskRepeat: 'no-repeat',
-      WebkitMaskRepeat: 'no-repeat',
-      maskPosition: 'center',
-      WebkitMaskPosition: 'center',
-    }
+      maskRepeat: "no-repeat",
+      WebkitMaskRepeat: "no-repeat",
+      maskPosition: "center",
+      WebkitMaskPosition: "center",
+    },
   };
 
-  const imageContainerStyle = imageMask !== 'none' ? imageMaskStyles[imageMask] : {};
+  const imageContainerStyle =
+    imageMask !== "none" ? imageMaskStyles[imageMask] : {};
 
   const DefaultLayout = () => (
     <div className="relative z-10 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center max-w-7xl mx-auto">
@@ -82,14 +85,14 @@ const ProfileHero = ({
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-[0.9] tracking-tight">
             {placeName}
           </h1>
-          <p 
+          <p
             className="text-3xl md:text-4xl lg:text-5xl font-medium italic animate-pulse"
-            style={{ 
+            style={{
               color: sloganColor,
               background: `${sloganColor}20`,
-              padding: '0.5rem 1rem',
-              borderRadius: '8px',
-              display: 'inline-block'
+              padding: "0.5rem 1rem",
+              borderRadius: "8px",
+              display: "inline-block",
             }}
           >
             {slogan}
@@ -106,14 +109,8 @@ const ProfileHero = ({
           <Badge variant="custom" customColor={badgeColor}>
             {age} years old
           </Badge>
-          <Badge variant="secondary">
-            Looking for {lookingFor}
-          </Badge>
-          {verified && (
-            <Badge variant="verified">
-              Verified
-            </Badge>
-          )}
+          <Badge variant="secondary">Looking for {lookingFor}</Badge>
+          {verified && <Badge variant="verified">Verified</Badge>}
         </div>
 
         {/* CTA Button */}
@@ -129,19 +126,22 @@ const ProfileHero = ({
 
       {/* Right Image */}
       <div className="relative animate-[fadeInUp_0.8s_ease-out_0.3s_both]">
-        {imageMask === 'none' && (
+        {imageMask === "none" && (
           <div
-            className={cn('absolute inset-0 scale-[0.9]', imageShapeClasses[imageShape])}
+            className={cn(
+              "absolute inset-0 scale-[0.9]",
+              imageShapeClasses[imageShape]
+            )}
             style={{ backgroundColor: imageBackgroundColor }}
           />
         )}
         <div
           className={cn(
-            'relative aspect-square overflow-hidden scale-[0.8]',
-            imageMask === 'none'
-              ? 'border-4 border-black shadow-[8px_8px_0px_0px_#000]'
-              : '',
-            imageMask === 'none' && imageShapeClasses[imageShape]
+            "relative aspect-square overflow-hidden scale-[0.8]",
+            imageMask === "none"
+              ? "border-4 border-black shadow-[8px_8px_0px_0px_#000]"
+              : "",
+            imageMask === "none" && imageShapeClasses[imageShape]
           )}
           style={imageContainerStyle}
         >
@@ -155,10 +155,10 @@ const ProfileHero = ({
             loading="lazy"
           />
         </div>
-        {imageMask === 'none' && (
+        {imageMask === "none" && (
           <div
             className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-8 px-4 py-2 rounded-full border-2 border-black shadow-[4px_4px_0px_0px_#000] rotate-12 text-black font-bold"
-            style={{ backgroundColor: '#B4E197' }}
+            style={{ backgroundColor: "#B4E197" }}
           >
             Hot Spot!
           </div>
@@ -173,11 +173,11 @@ const ProfileHero = ({
       <div className="relative animate-[fadeInUp_0.8s_ease-out_0.3s_both] mb-8">
         <div
           className={cn(
-            'relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 overflow-hidden',
-            imageMask === 'none'
-              ? 'border-4 border-black shadow-[8px_8px_0px_0px_#000]'
-              : '',
-            imageMask === 'none' && imageShapeClasses[imageShape]
+            "relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 overflow-hidden",
+            imageMask === "none"
+              ? "border-4 border-black shadow-[8px_8px_0px_0px_#000]"
+              : "",
+            imageMask === "none" && imageShapeClasses[imageShape]
           )}
           style={imageContainerStyle}
         >
@@ -216,14 +216,8 @@ const ProfileHero = ({
           <Badge variant="custom" customColor={badgeColor}>
             {age} years old
           </Badge>
-          <Badge variant="secondary">
-            Looking for {lookingFor}
-          </Badge>
-          {verified && (
-            <Badge variant="verified">
-              Verified
-            </Badge>
-          )}
+          <Badge variant="secondary">Looking for {lookingFor}</Badge>
+          {verified && <Badge variant="verified">Verified</Badge>}
         </div>
 
         {/* CTA Button */}
@@ -239,10 +233,84 @@ const ProfileHero = ({
     </div>
   );
 
+  const ArtisticLayout = () => (
+    <div className="relative z-10 min-h-screen flex items-center w-full">
+      {/* Background Image */}
+      <div className="absolute inset-0">
+        <img
+          src={imageUrl}
+          alt="Background"
+          className="w-full h-full object-cover opacity-30"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent"></div>
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 max-w-7xl mx-auto px-8 w-full">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="space-y-8 animate-[fadeInUp_0.6s_ease-out_0.2s_both]">
+            <h1 className="text-6xl md:text-8xl font-black leading-[0.9] text-white">
+              {placeName}
+            </h1>
+            <p
+              className="text-3xl md:text-4xl font-medium italic"
+              style={{ color: sloganColor }}
+            >
+              {slogan}
+            </p>
+
+            <div className="flex flex-wrap gap-4">
+              <Badge variant="mint" className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                {location}
+              </Badge>
+              <Badge variant="custom" customColor={badgeColor}>
+                {age} years old
+              </Badge>
+              <Badge variant="secondary">Looking for {lookingFor}</Badge>
+              {verified && <Badge variant="verified">Verified</Badge>}
+            </div>
+
+            <button
+              className="inline-flex items-center px-8 py-4 text-lg font-bold text-white rounded-full transition-all duration-200 hover:scale-105 shadow-[4px_4px_0px_0px_#000] focus:outline-none focus:ring-2 focus:ring-offset-2"
+              style={{ backgroundColor: buttonColor }}
+            >
+              Connect with Me <ArrowRight className="ml-2 h-5 w-5" />
+            </button>
+          </div>
+
+          <div className="animate-[fadeInUp_0.6s_ease-out_0.4s_both]">
+            <div
+              className={cn(
+                "relative w-full aspect-square overflow-hidden",
+                imageMask === "none"
+                  ? "border-4 border-white shadow-[12px_12px_0px_0px_rgba(255,255,255,0.3)] rounded-3xl"
+                  : ""
+              )}
+              style={imageContainerStyle}
+            >
+              <img
+                src={imageUrl}
+                alt={`Profile picture of ${placeName}`}
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                style={{
+                  transform: `translate(${imagePositionX}%, ${imagePositionY}%) scale(${imageScale})`,
+                }}
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderLayout = () => {
     switch (heroLayout) {
-      case 'centered':
+      case "centered":
         return <CenteredLayout />;
+      case "artistic":
+        return <ArtisticLayout />;
       default:
         return <DefaultLayout />;
     }
@@ -250,7 +318,10 @@ const ProfileHero = ({
 
   return (
     <section
-      className="relative min-h-screen overflow-hidden px-6 py-12 md:px-12 lg:px-16 transition-all duration-500 flex items-center"
+      className={cn(
+        "relative min-h-screen overflow-hidden transition-all duration-500 flex items-center",
+        heroLayout !== "artistic" && "px-6 py-12 md:px-12 lg:px-16"
+      )}
       style={{ ...backgroundStyle, fontFamily, color: textColor }}
     >
       {/* Navigation */}
@@ -258,16 +329,29 @@ const ProfileHero = ({
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="text-xl font-bold">Spark vibe</div>
           <div className="flex gap-8">
-            <a href="#resume" className="font-medium border-b-2 pb-1 transition-colors" style={{ color: sloganColor, borderColor: sloganColor }}>
+            <a
+              href="#resume"
+              className="font-medium border-b-2 pb-1 transition-colors"
+              style={{ color: sloganColor, borderColor: sloganColor }}
+            >
               Resume
             </a>
-            <a href="#work" className="opacity-60 hover:opacity-100 transition-opacity">
+            <a
+              href="#work"
+              className="opacity-60 hover:opacity-100 transition-opacity"
+            >
               Work
             </a>
-            <a href="#about" className="opacity-60 hover:opacity-100 transition-opacity">
+            <a
+              href="#about"
+              className="opacity-60 hover:opacity-100 transition-opacity"
+            >
               About
             </a>
-            <a href="#gallery" className="opacity-60 hover:opacity-100 transition-opacity">
+            <a
+              href="#gallery"
+              className="opacity-60 hover:opacity-100 transition-opacity"
+            >
               Gallery
             </a>
           </div>
@@ -279,8 +363,8 @@ const ProfileHero = ({
       {/* Background Glow Effects */}
       {glowEnabled && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <Glow 
-            variant="center" 
+          <Glow
+            variant="center"
             className="opacity-30"
             primaryColor={glowPrimaryColor}
             secondaryColor={glowSecondaryColor}
@@ -299,18 +383,20 @@ const ProfileHero = ({
             transform: translateY(0);
           }
         }
-        
+
         @keyframes float {
-          0%, 100% {
+          0%,
+          100% {
             transform: translateY(0px) rotate(0deg);
           }
           50% {
             transform: translateY(-10px) rotate(5deg);
           }
         }
-        
+
         @keyframes pulse {
-          0%, 100% {
+          0%,
+          100% {
             opacity: 0.6;
             transform: scale(1);
           }
@@ -319,11 +405,11 @@ const ProfileHero = ({
             transform: scale(1.1);
           }
         }
-        
+
         .floating-heart {
           animation: float 3s ease-in-out infinite;
         }
-        
+
         .pulse-heart {
           animation: pulse 2s ease-in-out infinite;
         }
@@ -332,4 +418,4 @@ const ProfileHero = ({
   );
 };
 
-export default ProfileHero; 
+export default ProfileHero;

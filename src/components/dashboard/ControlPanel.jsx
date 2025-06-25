@@ -590,42 +590,18 @@ const ControlPanel = ({ isOpen, onToggle, settings, onSettingsChange, onApplyPre
                     Design Type
                   </label>
                   <div className="grid grid-cols-2 gap-2">
-                    <button
-                      onClick={() => onSettingsChange(activeSection, { ...currentSettings, designType: 'card' })}
-                      className={cn(
-                        "p-3 text-sm font-medium rounded-md transition-colors",
-                        currentSettings.designType === 'card' ? "bg-pink-100 text-pink-800" : "bg-gray-100 text-gray-700"
-                      )}
-                    >
-                      Card Layout
-                    </button>
-                    <button
-                      onClick={() => onSettingsChange(activeSection, { ...currentSettings, designType: 'split' })}
-                      className={cn(
-                        "p-3 text-sm font-medium rounded-md transition-colors",
-                        currentSettings.designType === 'split' ? "bg-pink-100 text-pink-800" : "bg-gray-100 text-gray-700"
-                      )}
-                    >
-                      Split Layout
-                    </button>
-                    <button
-                      onClick={() => onSettingsChange(activeSection, { ...currentSettings, designType: 'timeline' })}
-                      className={cn(
-                        "p-3 text-sm font-medium rounded-md transition-colors",
-                        currentSettings.designType === 'timeline' ? "bg-pink-100 text-pink-800" : "bg-gray-100 text-gray-700"
-                      )}
-                    >
-                      Timeline Layout
-                    </button>
-                    <button
-                      onClick={() => onSettingsChange(activeSection, { ...currentSettings, designType: 'mosaic' })}
-                      className={cn(
-                        "p-3 text-sm font-medium rounded-md transition-colors",
-                        currentSettings.designType === 'mosaic' ? "bg-pink-100 text-pink-800" : "bg-gray-100 text-gray-700"
-                      )}
-                    >
-                      Mosaic Layout
-                    </button>
+                    {['floating', 'centered', 'sidebar', 'overlay', 'zigzag', 'magazine', 'polaroid', 'card'].map((type) => (
+                      <button
+                        key={type}
+                        onClick={() => onSettingsChange(activeSection, { ...currentSettings, designType: type })}
+                        className={cn(
+                          "p-3 text-sm font-medium rounded-md transition-colors capitalize",
+                          currentSettings.designType === type ? "bg-pink-100 text-pink-800" : "bg-gray-100 text-gray-700"
+                        )}
+                      >
+                        {type}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
@@ -681,22 +657,9 @@ const ControlPanel = ({ isOpen, onToggle, settings, onSettingsChange, onApplyPre
                       </button>
                     </div>
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Relationship Type
-                    </label>
-                    <textarea
-                      value={currentSettings.relationshipType}
-                      onChange={(e) => onSettingsChange(activeSection, { ...currentSettings, relationshipType: e.target.value })}
-                      className="w-full p-3 border rounded-md h-20 text-sm"
-                      placeholder="What kind of relationship are you looking for?"
-                    />
-                  </div>
                 </div>
               </div>
             )}
-
             {/* Design Tab for Interests */}
             {activeTab === 'design' && activeSection === 'interests' && (
               <div className="space-y-6">
@@ -980,7 +943,6 @@ const ControlPanel = ({ isOpen, onToggle, settings, onSettingsChange, onApplyPre
                 )}
               </div>
             )}
-
             {/* Layout Tab (only for hero section) */}
             {activeTab === 'layout' && activeSection === 'hero' && (
               <div className="space-y-6">
@@ -989,24 +951,18 @@ const ControlPanel = ({ isOpen, onToggle, settings, onSettingsChange, onApplyPre
                     Hero Layout
                   </label>
                   <div className="grid grid-cols-2 gap-2">
-                    <button
-                      onClick={() => onSettingsChange(activeSection, { ...currentSettings, heroLayout: 'default' })}
-                      className={cn(
-                        "p-3 text-sm font-medium rounded-md transition-colors",
-                        currentSettings.heroLayout === 'default' || !currentSettings.heroLayout ? "bg-pink-100 text-pink-800" : "bg-gray-100 text-gray-700"
-                      )}
-                    >
-                      Default
-                    </button>
-                    <button
-                      onClick={() => onSettingsChange(activeSection, { ...currentSettings, heroLayout: 'centered' })}
-                      className={cn(
-                        "p-3 text-sm font-medium rounded-md transition-colors",
-                        currentSettings.heroLayout === 'centered' ? "bg-pink-100 text-pink-800" : "bg-gray-100 text-gray-700"
-                      )}
-                    >
-                      Centered
-                    </button>
+                    {['split','artistic','centered'].map((layout) => (
+                      <button
+                        key={layout}
+                        onClick={() => onSettingsChange(activeSection, { ...currentSettings, heroLayout: layout })}
+                        className={cn(
+                          "p-3 text-sm font-medium rounded-md transition-colors capitalize",
+                          currentSettings.heroLayout === layout ? "bg-pink-100 text-pink-800" : "bg-gray-100 text-gray-700"
+                        )}
+                      >
+                        {layout}
+                      </button>
+                    ))}
                   </div>
                 </div>
                 <div>

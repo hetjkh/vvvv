@@ -12,10 +12,11 @@ const multer = require("multer");
 const { Server } = require("socket.io");
 const http = require("http");
 const axios = require("axios");
+const fs = require("fs");
 
 const upload = multer({ dest: "uploads/" });
 
-const app = express(); // Changed from appConfig to app
+const app = express();
 const server = http.createServer(app);
 const allowedOrigins = [
   "https://dating-mwt3.vercel.app",
@@ -43,7 +44,7 @@ const io = new Server(server, {
   },
 });
 
-app.use(express.json()); // Now correctly uses app
+app.use(express.json());
 app.use(cookieParser());
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 
@@ -73,44 +74,32 @@ const User = mongoose.model("User", UserSchema);
 const ProfileSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   nickname: { type: String, required: true },
-  avatar: { type: String },
+  age: { type: Number, min: 18 },
+  agePreference: {
+    min: { type: Number, min: 18 },
+    max: { type: Number, min: 18 }
+  },
   yourGender: {
     type: String,
     required: true,
     enum: ["male", "woman"],
     lowercase: true,
   },
-  introExtro: { type: String, required: true },
-  secretObsession: { type: String, required: true },
-  conversationStarter: { type: String },
-  decisionMaking: { type: String },
-  kitchenSkill: { type: String },
-  weekdayNight: { type: String },
-  weekendVibe: { type: String },
-  dealbreaker: { type: String, required: true },
-  firstDateEnergy: { type: String },
-  argueStyle: { type: String, required: true },
-  idealDate: { type: String, required: true },
-  uselessTalent: { type: String, required: true },
-  apocalypseRole: { type: String },
-  deepestFear: { type: String, required: true },
-  images: {
-    type: [String],
-    required: true,
-    validate: {
-      validator: (v) => v.length >= 4 && v.length <= 7,
-      message: "You must upload between 4 and 7 images!",
-    },
-  },
-  age: { type: Number, required: true, min: 18 },
   genderPreference: {
     type: String,
-    enum: ["male", "women", "both"],
+    enum: ["male", "woman", "both"],
     required: true,
     lowercase: true,
   },
-  favoriteMovie: { type: String, required: true },
-  favoriteMusic: { type: String, required: true },
+  slogan: { type: String },
+  country: { type: String },
+  state: { type: String },
+  about: { type: String },
+  personalityTraits: [{ type: String }],
+  bioImage: { type: String },
+  interests: [{ type: String }],
+  avatar: { type: String },
+  images: [{ type: String }],
   profileCompleted: { type: Boolean, default: false },
   lastUpdated: { type: Date, default: Date.now },
 });
@@ -321,9 +310,9 @@ io.on("connection", async (socket) => {
   const pairUser = async (userData) => {
     const { socket, userId } = userData;
     leaveCurrentSession();
-  
+
     waitingUsers = waitingUsers.filter((u) => u.userId !== userId);
-  
+
     let match = null;
     for (let i = 0; i < waitingUsers.length; i++) {
       const potentialMatch = waitingUsers[i];
@@ -336,15 +325,14 @@ io.on("connection", async (socket) => {
         }
       }
     }
-  
+
     if (match) {
       const sessionId = `${userId}-${match.userId}-${Date.now()}`;
       match.socket.leave(getSessionIdFromRooms.call(match.socket));
       socket.join(sessionId);
       match.socket.join(sessionId);
-  
-      // Determine offerer and answerer based on userId comparison
-      const isOfferer = userId < match.userId; // Smaller userId is the offerer
+
+      const isOfferer = userId < match.userId;
       socket.emit("paired", {
         message: "Connected with a stranger!",
         sessionId,
@@ -711,9 +699,14 @@ app.get("/profile", async (req, res) => {
 
 app.post("/user/profile", upload.fields([
   { name: "avatar", maxCount: 1 },
+  { name: "bioImage", maxCount: 1 },
   { name: "images", maxCount: 7 }
 ]), async (req, res) => {
   try {
+    console.log("Profile upload request received");
+    console.log("Files:", req.files);
+    console.log("Body:", req.body);
+
     const token = req.cookies.token;
     if (!token) return res.status(401).json({ message: "Unauthorized" });
 
@@ -725,22 +718,93 @@ app.post("/user/profile", upload.fields([
       const avatarFile = req.files.avatar[0];
       const result = await cloudinary.uploader.upload(avatarFile.path);
       avatarUrl = result.secure_url;
+      fs.unlinkSync(avatarFile.path);
+    }
+
+    let bioImageUrl = null;
+    if (req.files.bioImage) {
+      const bioImageFile = req.files.bioImage[0];
+      const result = await cloudinary.uploader.upload(bioImageFile.path);
+      bioImageUrl = result.secure_url;
+      fs.unlinkSync(bioImageFile.path);
     }
 
     const imageUrls = req.files.images
       ? await Promise.all(
           req.files.images.map(async (file) => {
             const result = await cloudinary.uploader.upload(file.path);
+            fs.unlinkSync(file.path);
             return result.secure_url;
           })
         )
-      : null;
+      : [];
+
+    let personalityTraits = req.body.personalityTraits;
+    if (typeof personalityTraits === 'string') {
+      try { personalityTraits = JSON.parse(personalityTraits); } catch { personalityTraits = [personalityTraits]; }
+    }
+    if (!Array.isArray(personalityTraits)) personalityTraits = [];
+
+    let interests = req.body.interests;
+    if (typeof interests === 'string') {
+      try { interests = JSON.parse(interests); } catch { interests = [interests]; }
+    }
+    if (!Array.isArray(interests)) interests = [];
+
+    let country = null;
+    let state = null;
+    if (req.body.countryState) {
+      try {
+        const countryState = typeof req.body.countryState === 'string' 
+          ? JSON.parse(req.body.countryState) 
+          : req.body.countryState;
+        if (countryState && typeof countryState === 'object') {
+          country = countryState.country || null;
+          state = countryState.state || null;
+        }
+      } catch (err) {
+        console.error("Error parsing countryState:", err);
+      }
+    }
+    if (!country && req.body.country) country = req.body.country;
+    if (!state && req.body.state) state = req.body.state;
+
+    let agePreference = null;
+    if (req.body.agePreference) {
+      try {
+        if (typeof req.body.agePreference === 'string') {
+          agePreference = JSON.parse(req.body.agePreference);
+        } else {
+          agePreference = req.body.agePreference;
+        }
+      } catch (err) {
+        console.error("Error parsing agePreference:", err);
+      }
+    }
+    if (!agePreference && (req.body.min || req.body.max)) {
+      agePreference = { min: req.body.min || null, max: req.body.max || null };
+    }
+    if (agePreference && (!agePreference.min || !agePreference.max)) {
+      console.warn("Invalid agePreference structure:", agePreference);
+      agePreference = null;
+    }
 
     let profile = await Profile.findOne({ userId });
     const profileData = {
-      ...req.body,
-      images: imageUrls || (profile ? profile.images : []),
+      nickname: req.body.nickname || (profile ? profile.nickname : ""),
+      age: req.body.age || (profile ? profile.age : null),
+      agePreference: agePreference || (profile ? profile.agePreference : null),
+      yourGender: req.body.yourGender || (profile ? profile.yourGender : ""),
+      genderPreference: req.body.genderPreference || (profile ? profile.genderPreference : ""),
+      slogan: req.body.slogan || (profile ? profile.slogan : ""),
+      country: country || (profile ? profile.country : null),
+      state: state || (profile ? profile.state : null),
+      about: req.body.about || (profile ? profile.about : ""),
+      personalityTraits: personalityTraits || (profile ? profile.personalityTraits : []),
+      bioImage: bioImageUrl || (profile ? profile.bioImage : null),
+      interests: interests || (profile ? profile.interests : []),
       avatar: avatarUrl || (profile ? profile.avatar : null),
+      images: [...(imageUrls || []), ...(profile ? profile.images : [])],
       profileCompleted: true,
       lastUpdated: Date.now(),
     };
@@ -863,7 +927,6 @@ app.get("/user/chat-messages/:partnerId", async (req, res) => {
   }
 });
 
-// GIF Search Route
 app.get("/gifs/search", async (req, res) => {
   try {
     const { query } = req.query;
@@ -888,6 +951,143 @@ app.get("/gifs/search", async (req, res) => {
   } catch (error) {
     console.error("Error fetching GIFs:", error);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.get("/test", (req, res) => {
+  res.json({ message: "Backend is working!", timestamp: new Date().toISOString() });
+});
+
+app.post("/test-profile", async (req, res) => {
+  try {
+    console.log("Test profile endpoint called");
+    console.log("Request body:", req.body);
+
+    let agePreference = null;
+    if (req.body.agePreference) {
+      try {
+        if (typeof req.body.agePreference === 'string') {
+          agePreference = JSON.parse(req.body.agePreference);
+        } else {
+          agePreference = req.body.agePreference;
+        }
+      } catch (err) {
+        console.error("Error parsing agePreference:", err);
+      }
+    }
+
+    let country = null;
+    let state = null;
+    if (req.body.countryState) {
+      try {
+        const countryState = typeof req.body.countryState === 'string' 
+          ? JSON.parse(req.body.countryState) 
+          : req.body.countryState;
+        if (countryState && typeof countryState === 'object') {
+          country = countryState.country || null;
+          state = countryState.state || null;
+        }
+      } catch (err) {
+        console.error("Error parsing countryState:", err);
+      }
+    }
+
+    res.json({
+      message: "Test successful",
+      received: {
+        agePreference: req.body.agePreference,
+        countryState: req.body.countryState,
+        country: req.body.country,
+        state: req.body.state
+      },
+      parsed: {
+        agePreference,
+        country,
+        state
+      }
+    });
+  } catch (error) {
+    console.error("Test endpoint error:", error);
+    res.status(500).json({ message: "Test failed", error: error.message });
+  }
+});
+
+app.post("/update", upload.fields([
+  { name: "avatar", maxCount: 1 },
+  { name: "bioImage", maxCount: 1 },
+  { name: "images", maxCount: 7 }
+]), async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) return res.status(401).json({ message: "Unauthorized" });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+
+    const { section } = req.body;
+    if (!section) return res.status(400).json({ message: "Section is required" });
+
+    let profile = await Profile.findOne({ userId });
+    if (!profile) {
+      profile = new Profile({ userId });
+    }
+
+    const sectionFields = {
+      "BASICS": ["nickname", "age", "agePreference", "yourGender", "genderPreference", "slogan", "country", "state", "about", "personalityTraits", "bioImage", "interests", "avatar"],
+    };
+
+    const fieldsToUpdate = sectionFields[section] || [];
+    const updateData = {};
+
+    fieldsToUpdate.forEach(field => {
+      if (req.body[field]) {
+        if (field === "agePreference" || field === "countryState") {
+          try {
+            updateData[field] = JSON.parse(req.body[field]);
+          } catch (e) {
+            updateData[field] = req.body[field];
+          }
+        } else if (["personalityTraits", "interests", "images"].includes(field)) {
+          try {
+            updateData[field] = JSON.parse(req.body[field]) || [];
+          } catch (e) {
+            updateData[field] = req.body[field] ? [req.body[field]] : [];
+          }
+        } else {
+          updateData[field] = req.body[field] || "";
+        }
+      }
+    });
+
+    if (req.files.avatar && req.files.avatar[0]) {
+      const result = await cloudinary.uploader.upload(req.files.avatar[0].path);
+      updateData.avatar = result.secure_url;
+      fs.unlinkSync(req.files.avatar[0].path);
+    }
+    if (req.files.bioImage && req.files.bioImage[0]) {
+      const result = await cloudinary.uploader.upload(req.files.bioImage[0].path);
+      updateData.bioImage = result.secure_url;
+      fs.unlinkSync(req.files.bioImage[0].path);
+    }
+    if (req.files.images) {
+      const imageUrls = await Promise.all(req.files.images.map(async file => {
+        const result = await cloudinary.uploader.upload(file.path);
+        fs.unlinkSync(file.path);
+        return result.secure_url;
+      }));
+      updateData.images = [...(profile.images || []), ...imageUrls];
+    }
+
+    const updatedProfile = await Profile.findOneAndUpdate(
+      { userId },
+      { $set: { ...profile.toObject(), ...updateData, lastUpdated: Date.now(), profileCompleted: true } },
+      { new: true, upsert: true }
+    );
+
+    res.json({ success: true, message: `Updated ${section} successfully`, profile: updatedProfile });
+  } catch (error) {
+    console.error("Update error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
