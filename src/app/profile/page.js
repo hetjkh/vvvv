@@ -17,6 +17,7 @@ import {
   Globe,
   User
 } from "lucide-react";
+import FaceVerification from "./FaceVerification";
 
 const ProfileQuestionnaire = () => {
   const [currentSection, setCurrentSection] = useState(0);
@@ -1038,22 +1039,33 @@ const ProfileQuestionnaire = () => {
             
             {/* Avatar Preview */}
             {currentQuestionData.id === "avatar" && (avatarPreview || profileData?.avatar) && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
-                className="mt-4"
-              >
-                <p className="text-sm font-bold mb-2">Avatar Preview:</p>
-                <motion.img
-                  whileHover={{ scale: 1.05 }}
-                  src={avatarPreview || profileData.avatar}
-                  alt="Avatar preview"
-                  className="w-32 h-32 object-cover border-4 border-black rounded-full cursor-pointer shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                  onClick={() => setLightboxImage(avatarPreview || profileData.avatar)}
-                  style={{ transform: "rotate(2deg)" }}
+              <>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="mt-4"
+                >
+                  <p className="text-sm font-bold mb-2">Avatar Preview:</p>
+                  <motion.img
+                    whileHover={{ scale: 1.05 }}
+                    src={avatarPreview || profileData.avatar}
+                    alt="Avatar preview"
+                    className="w-32 h-32 object-cover border-4 border-black rounded-full cursor-pointer shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                    onClick={() => setLightboxImage(avatarPreview || profileData.avatar)}
+                    style={{ transform: "rotate(2deg)" }}
+                  />
+                </motion.div>
+                <FaceVerification
+                  avatarUrl={avatarPreview || profileData.avatar}
+                  onVerified={() => {
+                    setAnswers((prev) => ({ ...prev, verified: true }));
+                  }}
                 />
-              </motion.div>
+                {answers.verified && (
+                  <div className="text-green-600 font-bold mt-2">Face Verified!</div>
+                )}
+              </>
             )}
             
             {/* Images Preview */}

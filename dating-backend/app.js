@@ -13,6 +13,10 @@ const { Server } = require("socket.io");
 const http = require("http");
 const axios = require("axios");
 const fs = require("fs");
+const faceapi = require('face-api.js');
+const nodeCanvas = require('canvas');
+const path = require('path');
+const fsPromises = require('fs').promises;
 
 const upload = multer({ dest: "uploads/" });
 
@@ -1088,6 +1092,77 @@ app.post("/update", upload.fields([
   } catch (error) {
     console.error("Update error:", error);
     res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// Face Verification Endpoint
+const { Canvas, Image, ImageData } = nodeCanvas;
+faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
+
+const modelsPath = path.join(__dirname, '../face-api.js/weights');
+let modelsLoaded = false;
+
+async function loadModelsOnce() {
+  if (!modelsLoaded) {
+    await faceapi.nets.ssdMobilenetv1.loadFromDisk(modelsPath);
+    await faceapi.nets.faceLandmark68Net.loadFromDisk(modelsPath);
+    await faceapi.nets.faceRecognitionNet.loadFromDisk(modelsPath);
+    modelsLoaded = true;
+  }
+}
+
+app.post('/api/verify-face', upload.fields([{ name: 'avatar' }, { name: 'capture' }]), async (req, res) => {
+  try {
+    await loadModelsOnce();
+    const avatarPath = req.files.avatar[0].path;
+    const capturePath = req.files.capture[0].path;
+
+    const avatarImg = await nodeCanvas.loadImage(avatarPath);
+    const captureImg = await nodeCanvas.loadImage(capturePath);
+
+    const avatarDetection = await faceapi.detectSingleFace(avatarImg).withFaceLandmarks().withFaceDescriptor();
+    const captureDetection = await faceapi.detectSingleFace(captureImg).withFaceLandmarks().withFaceDescriptor();
+
+    // Clean up uploaded files
+    await fsPromises.unlink(avatarPath);
+    await fsPromises.unlink(capturePath);
+
+    if (!avatarDetection || !captureDetection) {
+      return res.json({ verified: false, reason: 'Face not detected' });
+    }
+
+    const distance = faceapi.euclideanDistance(avatarDetection.descriptor, captureDetection.descriptor);
+    const verified = distance < 0.6;
+    res.json({ verified, distance });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ verified: false, error: err.message });
+  }
+});
+
+// Get all completed user profiles (for gallery/browse page)
+app.get("/api/profiles", async (req, res) => {
+  try {
+    const profiles = await Profile.find({ profileCompleted: true }, {
+      userId: 1,
+      nickname: 1,
+      age: 1,
+      yourGender: 1,
+      avatar: 1,
+      interests: 1,
+      country: 1,
+      state: 1,
+      slogan: 1,
+      bioImage: 1,
+      images: 1,
+      about: 1,
+      personalityTraits: 1,
+      _id: 0
+    });
+    res.json(profiles);
+  } catch (error) {
+    console.error("Error fetching profiles:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 

@@ -67,7 +67,7 @@ const BioSection = ({ settings }) => {
                   </div>
                   <h3 className="text-2xl font-bold text-gray-800">About Me</h3>
                 </div>
-                <p className="text-gray-700 text-lg leading-relaxed">{bio}</p>
+                <p className="text-gray-700 text-lg leading-relaxed" style={{ wordBreak: 'break-word' }}>{bio}</p>
               </div>
 
               {/* Personality Tags */}
@@ -123,7 +123,7 @@ const BioSection = ({ settings }) => {
 
           {/* Bio Content */}
           <div className="bg-white p-8 rounded-3xl border-4 border-black shadow-[8px_8px_0px_0px_#000] hover:shadow-[12px_12px_0px_0px_#000] hover:-translate-y-1 transition-all duration-300 mb-8 animate-[fadeInUp_0.6s_ease-out_0.4s_both]">
-            <p className="text-gray-700 text-xl leading-relaxed">{bio}</p>
+            <p className="text-gray-700 text-xl leading-relaxed" style={{ wordBreak: 'break-word' }}>{bio}</p>
           </div>
 
           {/* Personality Grid */}
@@ -184,7 +184,7 @@ const BioSection = ({ settings }) => {
                   <FileText className="h-8 w-8 text-blue-600" />
                   About Me
                 </h3>
-                <p className="text-gray-700 text-lg leading-relaxed">{bio}</p>
+                <p className="text-gray-700 text-lg leading-relaxed" style={{ wordBreak: 'break-word' }}>{bio}</p>
               </div>
 
               {/* Personality */}
@@ -249,7 +249,7 @@ const BioSection = ({ settings }) => {
               {/* Bio */}
               <div className="text-center mb-8">
                 <h3 className="text-3xl font-bold text-gray-800 mb-4">About Me</h3>
-                <p className="text-gray-700 text-lg leading-relaxed max-w-3xl mx-auto">{bio}</p>
+                <p className="text-gray-700 text-lg leading-relaxed" style={{ wordBreak: 'break-word' }} max-w-3xl mx-auto>{bio}</p>
               </div>
 
               {/* Personality */}
@@ -307,7 +307,7 @@ const BioSection = ({ settings }) => {
                   <FileText className="h-8 w-8 text-blue-600" />
                   About Me
                 </h3>
-                <p className="text-gray-700 text-lg leading-relaxed">{bio}</p>
+                <p className="text-gray-700 text-lg leading-relaxed" style={{ wordBreak: 'break-word' }}>{bio}</p>
               </div>
             </div>
 
@@ -382,7 +382,7 @@ const BioSection = ({ settings }) => {
                 <FileText className="h-6 w-6 text-blue-600" />
                 <h3 className="text-2xl font-bold text-gray-800">About Me</h3>
               </div>
-              <p className="text-gray-700 text-lg leading-relaxed">{bio}</p>
+              <p className="text-gray-700 text-lg leading-relaxed" style={{ wordBreak: 'break-word' }}>{bio}</p>
             </div>
 
             {/* Personality Cards */}
@@ -438,7 +438,7 @@ const BioSection = ({ settings }) => {
                   <FileText className="h-8 w-8 text-blue-600" />
                   About Me
                 </h3>
-                <p className="text-gray-700 text-lg leading-relaxed">{bio}</p>
+                <p className="text-gray-700 text-lg leading-relaxed" style={{ wordBreak: 'break-word' }}>{bio}</p>
               </div>
 
               {/* Personality */}
@@ -513,7 +513,7 @@ const BioSection = ({ settings }) => {
                 </div>
                 <h3 className="text-2xl font-bold text-gray-800">About Me</h3>
               </div>
-              <p className="text-gray-700 text-lg leading-relaxed">{bio}</p>
+              <p className="text-gray-700 text-lg leading-relaxed" style={{ wordBreak: 'break-word' }}>{bio}</p>
             </div>
 
             {/* Personality Card */}
